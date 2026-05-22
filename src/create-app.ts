@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs-extra";
 
-import {askQuestions} from "./prompt/questions";
+import { askQuestions } from "./prompt/questions";
 
 import { spinner } from "./utils/logger";
 
@@ -33,16 +33,20 @@ export async function createApp() {
   const answers = await askQuestions();
 
   // project path
-  const projectPath = path.join(
-    process.cwd(),
-    answers.projectName
-  );
+  const projectPath = 
+      answers.projectName === "."
+      ? process.cwd()
+      : path.join(process.cwd(), answers.projectName);
 
   // check if folder already exists
-  if (await fs.pathExists(projectPath)) {
-    spinner.fail("Folder already exists");
-    process.exit(1);
-  }
+if (
+  answers.projectName !== "." &&
+  (await fs.pathExists(projectPath))
+) {
+  spinner.fail("Folder already exists");
+
+  process.exit(1);
+}
 
   // loading start
   spinner.start("Creating project...");
@@ -56,74 +60,56 @@ export async function createApp() {
     generatePackageJson(answers),
     {
       spaces: 2,
-    }
+    },
   );
 
   // app.ts
-  await fs.writeFile(
-    `${projectPath}/src/app.ts`,
-    generateAppFile(answers)
-  );
+  await fs.writeFile(`${projectPath}/src/app.ts`, generateAppFile(answers));
 
   // server.ts
-  await fs.writeFile(
-    `${projectPath}/src/server.ts`,
-    generateServerFile()
-  );
+  await fs.writeFile(`${projectPath}/src/server.ts`, generateServerFile());
 
   // .env
-  await fs.writeFile(
-    `${projectPath}/.env`,
-    generateEnvFile()
-  );
+  await fs.writeFile(`${projectPath}/.env`, generateEnvFile());
 
   // error middleware
   await fs.writeFile(
     `${projectPath}/src/middlewares/error.middleware.ts`,
-    generateErrorMiddleware()
+    generateErrorMiddleware(),
   );
 
   // async handler
   await fs.writeFile(
     `${projectPath}/src/middlewares/asyncHandler.ts`,
-    generateAsyncHandler()
+    generateAsyncHandler(),
   );
 
   // auth controller
   await fs.writeFile(
     `${projectPath}/src/modules/auth/auth.controller.ts`,
-    generateAuthController()
+    generateAuthController(),
   );
 
   // auth route
   await fs.writeFile(
     `${projectPath}/src/modules/auth/auth.route.ts`,
-    generateAuthRoute()
+    generateAuthRoute(),
   );
 
   // auth service
   await fs.writeFile(
     `${projectPath}/src/modules/auth/auth.service.ts`,
-    generateAuthService()
+    generateAuthService(),
   );
 
-  await fs.writeFile(
-  `${projectPath}/.gitignore`,
-  generateGitignore()
-);
+  await fs.writeFile(`${projectPath}/.gitignore`, generateGitignore());
 
-await fs.writeJson(
-  `${projectPath}/tsconfig.json`,
-  generateTsConfig(),
-  {
+  await fs.writeJson(`${projectPath}/tsconfig.json`, generateTsConfig(), {
     spaces: 2,
-  }
-);
+  });
 
   // success
-  spinner.succeed(
-    "Project created successfully"
-  );
+  spinner.succeed("Project created successfully");
 
   console.log(`
 Next steps:

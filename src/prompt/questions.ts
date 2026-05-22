@@ -9,10 +9,10 @@ export async function askQuestions(): Promise<ProjectConfig> {
       message: "Project name:",
     },
     {
-      type: "list",
-      name: "language",
-      message: "Select language:",
-      choices: ["TypeScript", "JavaScript"],
+      type: "confirm",
+      name: "typescript",
+      message: "Use TypeScript?",
+      default: true,
     },
     {
       type: "confirm",

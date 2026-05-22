@@ -1,6 +1,6 @@
 export interface ProjectConfig {
   projectName: string;
-  language: string;
+  typescript: boolean;
   cors: boolean;
   morgan: boolean;
   dotenv: boolean;

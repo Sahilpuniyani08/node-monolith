@@ -40,7 +40,7 @@ export function generatePackageJson(
   }
 
   // typescript setup
-  if (config.language === "TypeScript") {
+  if (config.typescript) {
     devDependencies.typescript =
       devDependenciesVersion.typescript;
 
@@ -63,8 +63,7 @@ export function generatePackageJson(
     version: "1.0.0",
     scripts: {
       dev:
-        config.language ===
-        "TypeScript"
+          config.typescript
           ? "nodemon src/server.ts"
           : "nodemon src/server.js",
     },
