@@ -1,68 +1,74 @@
+// src/generators/app.generator.ts
+
 import { ProjectConfig } from "../types/config.types";
 
 export function generateAppFile(config: ProjectConfig) {
+  const ext = config.typescript ? "" : ".js";
+
   let imports = `
 import express from "express";
 `;
 
-  let middlewares = `
-app.use(express.json());
-`;
-
-  // dotenv
-  if (config.dotenv) {
-    imports += `
-import dotenv from "dotenv";
-`;
-
-    middlewares += `
-dotenv.config();
-`;
-  }
-
-  // cors
   if (config.cors) {
     imports += `
 import cors from "cors";
 `;
-
-    middlewares += `
-app.use(cors());
-`;
   }
 
-  // morgan
   if (config.morgan) {
     imports += `
 import morgan from "morgan";
 `;
+  }
 
-    middlewares += `
+  if (config.dotenv) {
+    imports += `
+import dotenv from "dotenv";
+`;
+  }
+
+  imports += `
+import routes from "./routes/index${ext}";
+import { errorMiddleware } from "./middlewares/error.middleware${ext}";
+`;
+
+  let setup = `
+const app = express();
+`;
+
+  if (config.dotenv) {
+    setup += `
+dotenv.config();
+`;
+  }
+
+  setup += `
+app.use(express.json());
+`;
+
+  if (config.cors) {
+    setup += `
+app.use(
+  cors({
+    origin: "*",
+  }),
+);
+`;
+  }
+
+  if (config.morgan) {
+    setup += `
 app.use(morgan("dev"));
 `;
   }
 
-  // error middleware import
-  imports += `
-import { errorMiddleware } from "./middlewares/error.middleware";
-`;
-
-  // auth route import
-  imports += `
-import authRoutes from "./modules/auth/auth.route";
-`;
-
   return `
 ${imports}
 
-const app = express();
+${setup}
 
-${middlewares}
+app.use("/api/v1", routes);
 
-// routes
-app.use("/api/v1/auth", authRoutes);
-
-// health check
 app.get("/", (req, res) => {
   res.json({
     success: true,
@@ -70,7 +76,6 @@ app.get("/", (req, res) => {
   });
 });
 
-// global error middleware
 app.use(errorMiddleware);
 
 export default app;

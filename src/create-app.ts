@@ -1,3 +1,5 @@
+// src/create-app.ts
+
 import path from "path";
 import fs from "fs-extra";
 
@@ -25,36 +27,35 @@ import {
   generateAuthRoute,
   generateAuthService,
 } from "./generators/auth.generator";
+
 import { generateGitignore } from "./generators/gitignore.generator";
+
 import { generateTsConfig } from "./generators/tsconfig.generator";
 
+import { generateRoutesIndex } from "./generators/routes.generator";
+
+import { generateApiErrorFile } from "./generators/apiError.generator";
+
 export async function createApp() {
-  // ask questions
   const answers = await askQuestions();
 
-  // project path
-  const projectPath = 
-      answers.projectName === "."
+  const ext = answers.typescript ? "ts" : "js";
+
+  const projectPath =
+    answers.projectName === "."
       ? process.cwd()
       : path.join(process.cwd(), answers.projectName);
 
-  // check if folder already exists
-if (
-  answers.projectName !== "." &&
-  (await fs.pathExists(projectPath))
-) {
-  spinner.fail("Folder already exists");
+  if (answers.projectName !== "." && (await fs.pathExists(projectPath))) {
+    spinner.fail("Folder already exists");
 
-  process.exit(1);
-}
+    process.exit(1);
+  }
 
-  // loading start
   spinner.start("Creating project...");
 
-  // create folders
   await generateFolders(projectPath);
 
-  // package.json
   await fs.writeJson(
     `${projectPath}/package.json`,
     generatePackageJson(answers),
@@ -63,52 +64,58 @@ if (
     },
   );
 
-  // app.ts
-  await fs.writeFile(`${projectPath}/src/app.ts`, generateAppFile(answers));
+  await fs.writeFile(`${projectPath}/src/app.${ext}`, generateAppFile(answers));
 
-  // server.ts
-  await fs.writeFile(`${projectPath}/src/server.ts`, generateServerFile());
+  await fs.writeFile(
+    `${projectPath}/src/server.${ext}`,
+    generateServerFile(answers.typescript),
+  );
 
-  // .env
   await fs.writeFile(`${projectPath}/.env`, generateEnvFile());
 
-  // error middleware
   await fs.writeFile(
-    `${projectPath}/src/middlewares/error.middleware.ts`,
-    generateErrorMiddleware(),
+    `${projectPath}/src/middlewares/error.middleware.${ext}`,
+    generateErrorMiddleware(answers.typescript),
   );
 
-  // async handler
   await fs.writeFile(
-    `${projectPath}/src/middlewares/asyncHandler.ts`,
-    generateAsyncHandler(),
+    `${projectPath}/src/middlewares/asyncHandler.${ext}`,
+    generateAsyncHandler(answers.typescript),
   );
 
-  // auth controller
   await fs.writeFile(
-    `${projectPath}/src/modules/auth/auth.controller.ts`,
-    generateAuthController(),
+    `${projectPath}/src/modules/auth/auth.controller.${ext}`,
+    generateAuthController(answers),
   );
 
-  // auth route
   await fs.writeFile(
-    `${projectPath}/src/modules/auth/auth.route.ts`,
-    generateAuthRoute(),
+    `${projectPath}/src/modules/auth/auth.route.${ext}`,
+    generateAuthRoute(answers),
   );
 
-  // auth service
   await fs.writeFile(
-    `${projectPath}/src/modules/auth/auth.service.ts`,
+    `${projectPath}/src/modules/auth/auth.service.${ext}`,
     generateAuthService(),
+  );
+
+  await fs.writeFile(
+    `${projectPath}/src/routes/index.${ext}`,
+    generateRoutesIndex(answers),
+  );
+
+  await fs.writeFile(
+    `${projectPath}/src/utils/apiError.${ext}`,
+    generateApiErrorFile(answers.typescript),
   );
 
   await fs.writeFile(`${projectPath}/.gitignore`, generateGitignore());
 
-  await fs.writeJson(`${projectPath}/tsconfig.json`, generateTsConfig(), {
-    spaces: 2,
-  });
+  if (answers.typescript) {
+    await fs.writeJson(`${projectPath}/tsconfig.json`, generateTsConfig(), {
+      spaces: 2,
+    });
+  }
 
-  // success
   spinner.succeed("Project created successfully");
 
   console.log(`

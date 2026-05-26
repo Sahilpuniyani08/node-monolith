@@ -1,68 +1,171 @@
-# node-monolith
+# Node Monolith
 
-Production-ready modular monolith backend boilerplate CLI for Node.js and Express.
+A production-ready Express.js modular monolith boilerplate CLI.
 
----
+Generate scalable backend architecture with:
 
-## Features
-
-- Modular monolith architecture
-- TypeScript support
+- TypeScript or JavaScript support
+- Modular folder structure
 - Global error handling
-- Async handler setup
+- Async handler
+- API Error utility
 - CORS support
 - Morgan logging
-- Environment configuration
-- Docker support
-- Production-ready folder structure
+- Environment variables
+- Centralized routes
+- Production-ready structure
 
 ---
 
-## Installation
+# Installation
 
-Run directly using npx:
+Run directly using npm:
 
 ```bash
-npx node-monolith create
+npm create node-monolith
+```
+
+OR
+
+```bash
+npx node-monolith
 ```
 
 ---
 
-## Generated Structure
+# Features
+
+✅ TypeScript support  
+✅ JavaScript support  
+✅ Modular monolith architecture  
+✅ Global error middleware  
+✅ Async handler utility  
+✅ API Error utility  
+✅ Environment setup  
+✅ CORS support  
+✅ Morgan logging  
+✅ Central route management  
+✅ Professional scalable structure
+
+---
+
+# CLI Questions
+
+The CLI asks:
+
+- Project name
+- TypeScript or JavaScript
+- Enable CORS
+- Enable Morgan logger
+- Enable dotenv
+- Enable Docker
+
+---
+
+# Generated Folder Structure
 
 ```txt
 src/
 ├── app.ts
 ├── server.ts
-├── config/
+├── routes/
+│   └── index.ts
 ├── middlewares/
+│   ├── error.middleware.ts
+│   └── asyncHandler.ts
+├── utils/
+│   └── apiError.ts
 ├── modules/
 │   └── auth/
-├── routes/
-├── utils/
+│       ├── auth.controller.ts
+│       ├── auth.route.ts
+│       └── auth.service.ts
 ```
 
----
-
-## Options
-
-The CLI supports:
-
-- TypeScript / JavaScript
-- CORS
-- Morgan
-- Docker
+(JavaScript projects generate `.js` files instead.)
 
 ---
 
-## Usage
+# Example Usage
 
 ```bash
-npx node-monolith create
+npm create node-monolith my-api
+```
+
+OR inside current folder:
+
+```bash
+npm create node-monolith .
 ```
 
 ---
 
-## Author
+# Generated API Structure
 
-Sahil Punyani
+```txt
+app.ts
+   ↓
+routes/index.ts
+   ↓
+modules/*
+```
+
+Routes are automatically mounted on:
+
+```txt
+/api/v1
+```
+
+Example:
+
+```txt
+/api/v1/auth/login
+```
+
+---
+
+# Included Utilities
+
+## ApiError
+
+```ts
+throw new ApiError(
+  "Unauthorized",
+  401
+);
+```
+
+---
+
+## Async Handler
+
+```ts
+asyncHandler(async (req, res) => {
+  // async logic
+});
+```
+
+---
+
+# Development
+
+```bash
+npm install
+npm run dev
+```
+
+---
+
+# Publish Your Own Version
+
+```bash
+npm version patch
+npm run build
+npm publish
+```
+
+---
+
+# License
+
+MIT

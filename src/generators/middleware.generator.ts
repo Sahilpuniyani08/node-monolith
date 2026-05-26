@@ -1,6 +1,13 @@
-export function generateErrorMiddleware() {
-  return `
-import { Request, Response, NextFunction } from "express";
+// src/generators/middleware.generator.ts
+
+export function generateErrorMiddleware(typescript: boolean) {
+  if (typescript) {
+    return `
+import {
+  Request,
+  Response,
+  NextFunction,
+} from "express";
 
 export const errorMiddleware = (
   err: any,
@@ -10,15 +17,39 @@ export const errorMiddleware = (
 ) => {
   res.status(500).json({
     success: false,
-    message: err.message || "Internal Server Error",
+    message:
+      err.message ||
+      "Internal Server Error",
+  });
+};
+`;
+  }
+
+  return `
+export const errorMiddleware = (
+  err,
+  req,
+  res,
+  next
+) => {
+  res.status(500).json({
+    success: false,
+    message:
+      err.message ||
+      "Internal Server Error",
   });
 };
 `;
 }
 
-export function generateAsyncHandler() {
-  return `
-import { Request, Response, NextFunction } from "express";
+export function generateAsyncHandler(typescript: boolean) {
+  if (typescript) {
+    return `
+import {
+  Request,
+  Response,
+  NextFunction,
+} from "express";
 
 export const asyncHandler =
   (fn: Function) =>
@@ -27,7 +58,20 @@ export const asyncHandler =
     res: Response,
     next: NextFunction
   ) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
+    Promise.resolve(
+      fn(req, res, next)
+    ).catch(next);
+  };
+`;
+  }
+
+  return `
+export const asyncHandler =
+  (fn) =>
+  (req, res, next) => {
+    Promise.resolve(
+      fn(req, res, next)
+    ).catch(next);
   };
 `;
 }

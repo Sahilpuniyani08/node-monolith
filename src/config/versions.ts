@@ -11,4 +11,6 @@ export const devDependenciesVersion = {
   "ts-node": "^10.9.2",
   "@types/node": "^22.0.0",
   "@types/express": "^5.0.0",
+  "@types/cors": "^2.8.17",
+  "@types/morgan": "^1.9.9",
 };
